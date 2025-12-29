@@ -2,6 +2,7 @@
 import React from 'react';
 import { Mail, Linkedin, MapPin, Phone, Github, Instagram, Music, Palette, PenTool, ExternalLink, Globe, Brush } from 'lucide-react';
 import { Project, Skill, Education, Achievement } from './types';
+import profileImage from './image/profile.jpg';
 
 export const PERSONAL_INFO = {
   name: "Annmariya Lalu",
@@ -13,7 +14,7 @@ export const PERSONAL_INFO = {
   linkedin: "https://linkedin.com/in/annmariya-lalu-2b0641353",
   instagram: "https://www.instagram.com/annmariyalalu_?igsh=MW4zMm0zZ3Zwc3g0cQ==",
   github: "https://github.com/Lallu932003",
-  photo: "image/profile.jpg"
+  photo: profileImage
 };
 
 export const PROJECTS: Project[] = [
