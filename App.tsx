@@ -1,29 +1,22 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Menu, X, Mail, Linkedin, Github, Instagram, Phone, MapPin, ChevronRight, Send, Heart, Calendar } from 'lucide-react';
-import emailjs from 'emailjs-com';
+import { Menu, X, Mail, Linkedin, Github, Instagram, Phone, MapPin, ChevronRight, Send, Heart, Calendar, Moon, Sun } from 'lucide-react';
 import { PERSONAL_INFO, PROJECTS, SKILLS, EDUCATION, ACHIEVEMENTS, INTERESTS } from './constants';
 import { ProjectCard } from './components/ProjectCard';
 import { SkillBar } from './components/SkillBar';
 import { TimelineItem } from './components/TimelineItem';
 import { SectionHeading } from './components/SectionHeading';
+import { useTheme } from './ThemeContext';
 
 const App: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
-  const [isLoading, setIsLoading] = useState(false);
-  const [formMessage, setFormMessage] = useState({ type: '', text: '' });
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Initialize EmailJS
-  useEffect(() => {
-    emailjs.init('YOUR_EMAILJS_PUBLIC_KEY');
   }, []);
 
   const navLinks = [
@@ -35,43 +28,6 @@ const App: React.FC = () => {
     { name: 'Contact', href: '#contact' },
   ];
 
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleFormSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.name || !formData.email || !formData.message) {
-      setFormMessage({ type: 'error', text: 'Please fill in all fields' });
-      return;
-    }
-
-    setIsLoading(true);
-    setFormMessage({ type: '', text: '' });
-
-    try {
-      await emailjs.send(
-        'YOUR_SERVICE_ID',
-        'YOUR_TEMPLATE_ID',
-        {
-          to_email: PERSONAL_INFO.email,
-          from_name: formData.name,
-          from_email: formData.email,
-          message: formData.message,
-        }
-      );
-      
-      setFormMessage({ type: 'success', text: 'Message sent successfully! I\'ll get back to you soon.' });
-      setFormData({ name: '', email: '', message: '' });
-    } catch (error) {
-      setFormMessage({ type: 'error', text: 'Failed to send message. Please try again.' });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <div className="portfolio-wrap">
       {/* Background Decor */}
@@ -80,11 +36,20 @@ const App: React.FC = () => {
 
       {/* Navigation */}
       <nav className={`navbar navbar-expand-lg fixed-top transition-all ${scrolled ? 'bg-dark shadow-sm py-2' : 'bg-transparent py-4'}`}>
-        <div className="container">
+        <div className="container d-flex justify-content-between align-items-center">
           <a className="navbar-brand font-display fw-bold text-pink fs-3" href="#home">AL.</a>
-          <button className="navbar-toggler border-0 text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <Menu className="text-white" />
-          </button>
+          <div className="d-flex align-items-center gap-3">
+            <button 
+              className="btn btn-sm btn-outline-light rounded-circle theme-toggle p-2 d-none d-lg-flex"
+              onClick={toggleTheme}
+              title="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+            <button className="navbar-toggler border-0 text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+              <Menu className="text-white" />
+            </button>
+          </div>
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav ms-auto gap-lg-4 text-center mt-3 mt-lg-0">
               {navLinks.map((link) => (
@@ -92,6 +57,15 @@ const App: React.FC = () => {
                   <a className="nav-link" href={link.href}>{link.name}</a>
                 </li>
               ))}
+              <li className="nav-item d-lg-none mt-3">
+                <button 
+                  className="btn btn-sm btn-outline-light rounded-pill w-100"
+                  onClick={toggleTheme}
+                >
+                  {theme === 'dark' ? <Sun size={18} className="me-2" /> : <Moon size={18} className="me-2" />}
+                  {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                </button>
+              </li>
             </ul>
           </div>
         </div>
@@ -277,53 +251,23 @@ const App: React.FC = () => {
               </div>
             </div>
             <div className="col-lg-7">
-              <form className="glass-card p-5" onSubmit={handleFormSubmit}>
+              <form className="glass-card p-5" onSubmit={e => e.preventDefault()}>
                 <div className="row g-4">
                   <div className="col-md-6">
                     <label className="form-label text-white fw-bold mb-2">Name</label>
-                    <input 
-                      type="text" 
-                      name="name"
-                      value={formData.name}
-                      onChange={handleFormChange}
-                      className="form-control bg-dark border-secondary text-white py-3 rounded-4" 
-                      placeholder="Your Name" 
-                    />
+                    <input type="text" className="form-control bg-dark border-secondary text-white py-3 rounded-4" placeholder="Your Name" />
                   </div>
                   <div className="col-md-6">
                     <label className="form-label text-white fw-bold mb-2">Email</label>
-                    <input 
-                      type="email" 
-                      name="email"
-                      value={formData.email}
-                      onChange={handleFormChange}
-                      className="form-control bg-dark border-secondary text-white py-3 rounded-4" 
-                      placeholder="Email Address" 
-                    />
+                    <input type="email" className="form-control bg-dark border-secondary text-white py-3 rounded-4" placeholder="Email Address" />
                   </div>
                   <div className="col-12">
                     <label className="form-label text-white fw-bold mb-2">Message</label>
-                    <textarea 
-                      name="message"
-                      value={formData.message}
-                      onChange={handleFormChange}
-                      className="form-control bg-dark border-secondary text-white py-3 rounded-4" 
-                      rows={5} 
-                      placeholder="How can I help you?"
-                    ></textarea>
+                    <textarea className="form-control bg-dark border-secondary text-white py-3 rounded-4" rows={5} placeholder="How can I help you?"></textarea>
                   </div>
-                  {formMessage.text && (
-                    <div className={`col-12 alert ${formMessage.type === 'success' ? 'alert-success' : 'alert-danger'}`}>
-                      {formMessage.text}
-                    </div>
-                  )}
                   <div className="col-12">
-                    <button 
-                      type="submit"
-                      disabled={isLoading}
-                      className="btn btn-pink w-100 py-3 d-flex align-items-center justify-center gap-2"
-                    >
-                      {isLoading ? 'Sending...' : 'Send Message'} <Send size={18} />
+                    <button className="btn btn-pink w-100 py-3 d-flex align-items-center justify-center gap-2">
+                      Send Message <Send size={18} />
                     </button>
                   </div>
                 </div>
